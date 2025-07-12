@@ -1,31 +1,34 @@
- export enum Role{
-    SUPERADMIN="SUPERADMIN",
-    ADMIN="ADMIN",
-    USER="USER",
-    GUIDE="GUIDE"
- }
+import { Types } from "mongoose"
 
- export enum IsActive{
-    ACTIVE="ACTIVE",
-    INACTIVE="INACTIVE",
-    BLOCKED="BLOCKED"
- }
+export enum Role {
+   SUPERADMIN = "SUPERADMIN",
+   ADMIN = "ADMIN",
+   USER = "USER",
+   GUIDE = "GUIDE"
+}
 
- export interface IAuthProvider{
-    provider:string,
-    providerId:string
- }
+export enum IsActive {
+   ACTIVE = "ACTIVE",
+   INACTIVE = "INACTIVE",
+   BLOCKED = "BLOCKED"
+}
 
-export interface IUser{
-    name:string,
-    email:string,
-    password?:string,
-    role:Role,
-    picture?:string,
-    phone?:string,
-    address?:string,
-    isDeleted?:boolean,
-    isActive?:IsActive,
-    isVerified?:boolean,
-    auths:IAuthProvider[]
+export interface IAuthProvider {
+   provider: 'Google' | 'Credential',
+   providerId: string
+}
+
+export interface IUser {
+   _id?: Types.ObjectId,
+   name: string,
+   email: string,
+   password?: string,
+   role: Role,
+   picture?: string,
+   phone?: string,
+   address?: string,
+   isDeleted?: boolean,
+   isActive?: IsActive,
+   isVerified?: boolean,
+   auths: IAuthProvider[]
 }
