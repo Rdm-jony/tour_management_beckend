@@ -10,13 +10,20 @@ interface EnvConfig {
     JWT_ACCESS_EXPIRES: string,
     JWT_REFRESH_SECRET: string,
     JWT_REFRESH_EXPIRES: string,
+
     SUPER_ADMIN_EMAIL: string,
     SUPER_ADMIN_PASSWORD: string,
+
+    GOOGLE_CLIENT_ID:string,
+    GOOGLE_CLIENT_SECRET:string,
+    CALLBACK_URL:string,
+    SESSION_SECRET:string,
+    FRONT_END_URL:string
 
 }
 
 const loadEnvVariables = (): EnvConfig => {
-    const requiredEnvVariables: string[] = ['PORT', 'DB_URL', 'NODE_ENV', 'JWT_ACCESS_SECRET', 'JWT_ACCESS_EXPIRES','JWT_REFRESH_SECRET','JWT_REFRESH_EXPIRES', 'SUPER_ADMIN_EMAIL', 'SUPER_ADMIN_PASSWORD']
+    const requiredEnvVariables: string[] = ['PORT', 'DB_URL', 'NODE_ENV', 'JWT_ACCESS_SECRET', 'JWT_ACCESS_EXPIRES','JWT_REFRESH_SECRET','JWT_REFRESH_EXPIRES', 'SUPER_ADMIN_EMAIL', 'SUPER_ADMIN_PASSWORD','GOOGLE_CLIENT_ID','GOOGLE_CLIENT_SECRET','CALLBACK_URL','SESSION_SECRET','FRONT_END_URL']
 
     requiredEnvVariables.forEach(key => {
         if (!process.env[key]) {
@@ -33,6 +40,12 @@ const loadEnvVariables = (): EnvConfig => {
         JWT_REFRESH_EXPIRES: process.env.JWT_REFRESH_EXPIRES as string,
         SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL as string,
         SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD as string,
+        GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
+        GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
+        CALLBACK_URL: process.env.CALLBACK_URL as string,
+        SESSION_SECRET: process.env.SESSION_SECRET as string,
+        FRONT_END_URL: process.env.FRONT_END_URL as string,
+
     }
 }
 
