@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express"
 import { catchAsync } from "../../utils/catchAsync"
@@ -12,14 +13,23 @@ import passport from "passport"
 
 
 const credentialsLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const loginInfo = await AuthServices.credentialsLogin(req.body)
-    setAuthCookie(res, loginInfo)
-    sendResponse(res, {
-        success: true,
-        statusCode: httpStatusCode.OK,
-        message: "User Logged In Successfully",
-        data: loginInfo,
-    })
+    passport.authenticate("local", async (err: any, user: any) => {
+        if (err) {
+            return next(new AppError(401, err))
+        }
+
+        delete user.toObject().password
+        const userTokens = createUserTokens(user)
+        setAuthCookie(res, userTokens)
+        sendResponse(res, {
+            success: true,
+            statusCode: httpStatusCode.OK,
+            message: "User Logged In Successfully",
+            data: user,
+        })
+
+    })(req,res,next)
+
 })
 const getNewAccessToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken = req.cookies.refreshToken
