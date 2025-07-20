@@ -5,7 +5,6 @@ import { Division } from "./division.model";
 import httpStatusCode from "http-status-codes"
 
 const createDivision = async (payload: Partial<IDivision>) => {
-    payload.slug = payload.name?.split(" ").join("-").toLowerCase()
     const newDivision = await Division.create(payload)
     return {
         newDivision
@@ -24,8 +23,18 @@ const updateDivision = async (divisionId: string, payload: Partial<IDivision>) =
     if (!findDivision) {
         throw new AppError(httpStatusCode.NOT_FOUND, "divison not found.Use valid objectId")
     }
-    payload.slug = payload.name?.split(" ").join("-").toLowerCase()
+
+    const duplicateDivision = await Division.findOne({
+        name: { $regex: `^${payload.name}$`, $options: "i" },
+        _id: { $ne: divisionId },
+    });
+
+    if (duplicateDivision) {
+        throw new Error("A division with this name already exists.");
+    }
+
     const updatedDivision = await Division.findByIdAndUpdate(divisionId, payload, { new: true, runValidators: true })
+
     return {
         updatedDivision
     }

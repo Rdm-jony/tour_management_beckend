@@ -1,0 +1,1 @@
+export const excludeField:string[] =['searchText','fieldFilter','sort','limit','page']
