@@ -4,6 +4,7 @@ import { User } from "./user.model";
 import htttpStatusCode from "http-status-codes"
 import bcrypt from "bcryptjs";
 import { JwtPayload } from "jsonwebtoken";
+import { deleteImageFromCLoudinary } from "../../config/cloudinary.confilg";
 
 const creteUser = async (payload: Partial<IUser>) => {
 
@@ -48,6 +49,9 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
     }
 
     const newUpdateUser = await User.findByIdAndUpdate(userId, payload, { new: true, runValidators: true })
+    if (isUserExist.picture) {
+        await deleteImageFromCLoudinary(isUserExist.picture)
+    }
 
     return newUpdateUser
 }

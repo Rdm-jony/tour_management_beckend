@@ -89,6 +89,9 @@ export const updateTourZodSchema = z.object({
     images: z
         .array(z.string().url("Each image must be a valid URL"))
         .optional(),
+    deletedImages: z
+        .array(z.string().url("Each image must be a valid URL"))
+        .optional(),
 
     amenities: z
         .array(z.string())

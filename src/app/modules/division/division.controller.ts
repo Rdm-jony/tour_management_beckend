@@ -4,9 +4,14 @@ import { catchAsync } from "../../utils/catchAsync";
 import { divisionServices } from "./division.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatusCode from "http-status-codes"
+import { IDivision } from "./division.interface";
 
 const createDivision = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const division = await divisionServices.createDivision(req.body)
+    const payload: IDivision = {
+        ...req.body,
+        thumbnail: req.file?.path
+    }
+    const division = await divisionServices.createDivision(payload)
     sendResponse(res, {
         data: division.newDivision,
         message: "division create successFully",
@@ -25,8 +30,12 @@ const getDivision = catchAsync(async (req: Request, res: Response, next: NextFun
     })
 })
 const updateDivision = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const divisionId=req.params.id
-    const division = await divisionServices.updateDivision(divisionId,req.body)
+    const divisionId = req.params.id
+    const payload:IDivision={
+        ...req.body,
+        thumbnail:req?.file?.path
+    }
+    const division = await divisionServices.updateDivision(divisionId, payload)
     sendResponse(res, {
         data: division.updatedDivision,
         message: "division updated successFully",
@@ -35,7 +44,7 @@ const updateDivision = catchAsync(async (req: Request, res: Response, next: Next
     })
 })
 const deleteDivision = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const divisionId=req.params.id
+    const divisionId = req.params.id
     const division = await divisionServices.deleteDivision(divisionId)
     sendResponse(res, {
         data: division,
