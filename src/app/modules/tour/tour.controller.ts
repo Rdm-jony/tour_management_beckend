@@ -4,6 +4,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import { tourServices } from "./tour.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatusCode from "http-status-codes"
+import { ITour } from "./tour.interface";
 
 const createTourType = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const tourType = await tourServices.createTourType(req.body)
@@ -44,7 +45,11 @@ const deleteTourType = catchAsync(async (req: Request, res: Response, next: Next
     })
 })
 const createTour = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const tour = await tourServices.createTour(req.body)
+    const payload: ITour = {
+        ...req.body,
+        images: (req.files as Express.Multer.File[])?.map(file => file.path)
+    }
+    const tour = await tourServices.createTour(payload)
     sendResponse(res, {
         data: tour.newTour,
         message: "tour created successfully!",
@@ -53,19 +58,23 @@ const createTour = catchAsync(async (req: Request, res: Response, next: NextFunc
     })
 })
 const getAllTour = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-   const query=req.query as Record<string,string>
-   const tour= await tourServices.getAllTour(query)
+    const query = req.query as Record<string, string>
+    const tour = await tourServices.getAllTour(query)
     sendResponse(res, {
         data: tour.getTours,
-        meta:tour.meta,
+        meta: tour.meta,
         message: "tour retrived successfully!",
         statusCode: httpStatusCode.OK,
         success: true
     })
 })
 const updateTour = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-   const tourId=req.params.id
-    const tour = await tourServices.updateTour(tourId,req.body)
+    const tourId = req.params.id
+    const payload: ITour = {
+        ...req.body,
+        images: (req.files as Express.Multer.File[])?.map(file => file.path)
+    }
+    const tour = await tourServices.updateTour(tourId, payload)
     sendResponse(res, {
         data: tour.updatedTour,
         message: "tour updated successfully!",
@@ -74,7 +83,7 @@ const updateTour = catchAsync(async (req: Request, res: Response, next: NextFunc
     })
 })
 const deleteTour = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-   const tourId=req.params.id
+    const tourId = req.params.id
     const tour = await tourServices.deleteTour(tourId)
     sendResponse(res, {
         data: tour,
@@ -86,4 +95,4 @@ const deleteTour = catchAsync(async (req: Request, res: Response, next: NextFunc
 
 
 
-export const tourControllers = { createTourType, getTourType, updateTourType, deleteTourType, createTour,getAllTour ,updateTour,deleteTour}
+export const tourControllers = { createTourType, getTourType, updateTourType, deleteTourType, createTour, getAllTour, updateTour, deleteTour }

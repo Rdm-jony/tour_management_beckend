@@ -1,3 +1,4 @@
+import { deleteImageFromCLoudinary } from "../../config/cloudinary.confilg";
 import AppError from "../../errorHelpers/AppError";
 import { Tour } from "../tour/tour.model";
 import { IDivision } from "./division.interface";
@@ -34,6 +35,9 @@ const updateDivision = async (divisionId: string, payload: Partial<IDivision>) =
     }
 
     const updatedDivision = await Division.findByIdAndUpdate(divisionId, payload, { new: true, runValidators: true })
+    if(findDivision.thumbnail){
+        await deleteImageFromCLoudinary(findDivision.thumbnail)
+    }
 
     return {
         updatedDivision

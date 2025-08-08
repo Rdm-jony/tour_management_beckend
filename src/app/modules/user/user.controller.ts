@@ -5,9 +5,14 @@ import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatusCode from "http-status-codes"
 import { JwtPayload } from "jsonwebtoken";
+import { IUser } from "./user.interface";
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
-    const user = await userServices.creteUser(req.body);
+    const payload: IUser = {
+        ...req.body,
+        picture: req.file?.path
+    }
+    const user = await userServices.creteUser(payload);
     sendResponse(res, {
         success: true,
         statusCode: httpStatusCode.CREATED,
@@ -17,10 +22,13 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateUser = catchAsync(async (req: Request, res: Response) => {
-    const userId=req.params.id
-    const payload=req.body
-    const decodedToken=req.user
-    const user = await userServices.updateUser(userId,payload,decodedToken as JwtPayload);
+    const userId = req.params.id
+    const payload: IUser = {
+        ...req.body,
+        picture: req.file?.path
+    }
+    const decodedToken = req.user
+    const user = await userServices.updateUser(userId, payload, decodedToken as JwtPayload);
     sendResponse(res, {
         success: true,
         statusCode: httpStatusCode.CREATED,
@@ -41,5 +49,25 @@ const getAllUser = catchAsync(async (req: Request, res: Response) => {
         }
     })
 })
+const getSingleUser = catchAsync(async (req: Request, res: Response) => {
+    const userId = req.params.id
+    const user = await userServices.getSingleUser(userId)
+    sendResponse(res, {
+        data: user,
+        message: "user retrived successfully",
+        statusCode: httpStatusCode.OK,
+        success: true
+    })
+})
+const getMe = catchAsync(async (req: Request, res: Response) => {
+    const decodedToken = req.user as JwtPayload
+    const user = await userServices.getMe(decodedToken.userId)
+    sendResponse(res, {
+        data: user,
+        message: "user retrived successfully",
+        statusCode: httpStatusCode.OK,
+        success: true
+    })
+})
 
-export const userControllers = { createUser, getAllUser,updateUser }
+export const userControllers = { createUser, getAllUser, updateUser,getMe,getSingleUser }

@@ -37,7 +37,7 @@ export class QueryBuilder<T> {
     }
 
     fields(): this {
-        const fieldFilter = this.query.fieldFilter.split(",").join(" ") || ""
+        const fieldFilter = this.query.fieldFilter?.split(",").join(" ") || ""
         this.modelQuery = this.modelQuery.select(fieldFilter)
         return this
     }

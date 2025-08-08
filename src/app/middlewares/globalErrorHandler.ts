@@ -2,20 +2,40 @@
 import { NextFunction, Request, Response } from "express"
 import { envVars } from "../config/env"
 import AppError from "../errorHelpers/AppError"
-import {  TErrorSource } from "../interfaces/errorTypes"
+import { TErrorSource } from "../interfaces/errorTypes"
 import { handleValidationError } from "../errorHelpers/validattionError"
 import { handleDuplicateError } from "../errorHelpers/duplicateError"
 import { handleCastError } from "../errorHelpers/castError"
 import { handleZodeError } from "../errorHelpers/zodError"
+import { deleteImageFromCLoudinary } from "../config/cloudinary.confilg"
 
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+export const globalErrorHandler = async (err: any, req: Request, res: Response, next: NextFunction) => {
     let statusCode = 500
     let message = "something went wrong!"
 
+    if (req.file) {
+        await deleteImageFromCLoudinary(req.file.path)
+    }
+
+    if (req.files && Array.isArray(req.files) && req.files.length) {
+        const imageUrls = (req.files as Express.Multer.File[]).map(file => file.path)
+
+
+        await Promise.all(imageUrls.map(url => deleteImageFromCLoudinary(url)))
+    }
+
+
     let errorSources: TErrorSource[] = []
-    if (err.name === "ValidationError") {
+    if (err.name === 'ZodError') {
+        console.log(err.name)
+        const simplyfiedError = handleZodeError(err)
+        statusCode = simplyfiedError.statusCode;
+        message = simplyfiedError.message;
+        errorSources = simplyfiedError.errorSources as TErrorSource[]
+    }
+    else if (err.name === "ValidationError") {
         const simplyfiedError = handleValidationError(err)
         statusCode = simplyfiedError.statusCode
         message = simplyfiedError.message
@@ -31,12 +51,7 @@ export const globalErrorHandler = (err: any, req: Request, res: Response, next: 
         statusCode = simplyfiedError.statusCode
         message = simplyfiedError.message
     }
-    else if (err.name === 'ZodError') {
-        const simplyfiedError = handleZodeError(err)
-        statusCode = simplyfiedError.statusCode;
-        message = simplyfiedError.message;
-        errorSources=simplyfiedError.errorSources as TErrorSource[]
-    }
+
     else if (err instanceof AppError) {
         statusCode = err.statusCode
         message = err.message

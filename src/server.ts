@@ -4,6 +4,9 @@ import { Server } from "http"
 import app from "./app";
 import { envVars } from "./app/config/env";
 import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
+import { connectRedis } from "./app/config/redis.config";
+// import { llmWithTools, suggestTourTool } from "./app/tools/suggestTourTool";
+// import { HumanMessage } from "@langchain/core/messages";
 
 let server: Server;
 const startServer = async () => {
@@ -14,14 +17,25 @@ const startServer = async () => {
         server = app.listen(5000, () => {
             console.log(`server running on port ${envVars.PORT} ✔`)
         })
+
+        // const messages = [new HumanMessage("suggest a tour location in chittagong?")];
+
+        // const aiMessage = await llmWithTools.invoke(messages);
+        // messages.push(aiMessage);
+
+        // const toolMessage = await suggestTourTool.invoke(aiMessage.tool_calls?.[0]);
+        // messages.push(toolMessage);
+        // console.log(messages)
+
     } catch (error) {
         console.log(error)
     }
 }
 
-(async() => {
-   await startServer()
-   await seedSuperAdmin()
+(async () => {
+    await connectRedis()
+    await startServer()
+    await seedSuperAdmin()
 })()
 
 //unhandle promise reject error
