@@ -1,7 +1,7 @@
 import AppError from "../../errorHelpers/AppError";
 import { IAuthProvider, IUser, Role } from "./user.interface";
 import { User } from "./user.model";
-import htttpStatusCode from "http-status-codes"
+import httpStatusCode from "http-status-codes"
 import bcrypt from "bcryptjs";
 import { JwtPayload } from "jsonwebtoken";
 import { deleteImageFromCLoudinary } from "../../config/cloudinary.confilg";
@@ -11,7 +11,7 @@ const creteUser = async (payload: Partial<IUser>) => {
     const { email, password, ...rest } = payload
     const isUserExist = await User.findOne({ email })
     if (isUserExist) {
-        throw new AppError(htttpStatusCode.BAD_REQUEST, "user already exists")
+        throw new AppError(httpStatusCode.BAD_REQUEST, "user already exists")
     }
 
     const hashPassword = await bcrypt.hash(password as string, 10)
@@ -25,22 +25,22 @@ const creteUser = async (payload: Partial<IUser>) => {
 const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken: JwtPayload) => {
     const isUserExist = await User.findById(userId)
     if (!isUserExist) {
-        throw new AppError(htttpStatusCode.FORBIDDEN, "You are not authorized")
+        throw new AppError(httpStatusCode.FORBIDDEN, "You are not authorized")
     }
     if (payload.role) {
         if (decodedToken.role == Role.USER || decodedToken.role == Role.GUIDE) {
-            throw new AppError(htttpStatusCode.FORBIDDEN, "You are not authorized")
+            throw new AppError(httpStatusCode.FORBIDDEN, "You are not authorized")
         }
 
         if (payload.role == Role.SUPERADMIN && decodedToken.role == Role.ADMIN) {
-            throw new AppError(htttpStatusCode.FORBIDDEN, "You are not authorized")
+            throw new AppError(httpStatusCode.FORBIDDEN, "You are not authorized")
 
         }
     }
 
     if (payload.isActive || payload.isDeleted || payload.isVerified) {
         if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
-            throw new AppError(htttpStatusCode.FORBIDDEN, "You are not authorized");
+            throw new AppError(httpStatusCode.FORBIDDEN, "You are not authorized");
         }
     }
 
@@ -56,6 +56,7 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
     return newUpdateUser
 }
 
+
 const getAllUser = async () => {
     const user = await User.find({})
     const total = await User.countDocuments()
@@ -65,9 +66,27 @@ const getAllUser = async () => {
         total
     }
 }
+const getSingleUser = async (userId: string) => {
+    const isUserExists = await User.findById(userId).select("-password")
+    if (!isUserExists) {
+        throw new AppError(httpStatusCode.NOT_FOUND, "user not found!")
+    }
+
+    return isUserExists
+}
+const getMe = async (userId: string) => {
+    const isUserExists = await User.findById(userId).select("-password")
+    if (!isUserExists) {
+        throw new AppError(httpStatusCode.NOT_FOUND, "user not found!")
+    }
+
+    return isUserExists
+}
 
 export const userServices = {
     creteUser,
     getAllUser,
-    updateUser
+    updateUser,
+    getSingleUser,
+    getMe
 }

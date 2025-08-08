@@ -13,7 +13,7 @@ interface EnvConfig {
 
     SUPER_ADMIN_EMAIL: string,
     SUPER_ADMIN_PASSWORD: string,
-
+    BCRYPT_SALT: string,
     GOOGLE_CLIENT_ID: string,
     GOOGLE_CLIENT_SECRET: string,
     CALLBACK_URL: string,
@@ -42,6 +42,12 @@ interface EnvConfig {
         SMTP_PORT: string,
         SMTP_PASS: string,
         SMTP_FROM: string,
+    },
+    REDIS: {
+        REDIS_USERNAME: string,
+        REDIS_PASSWORD: string,
+        REDIS_HOST: string,
+        REDIS_PORT: string
     }
 
 }
@@ -51,7 +57,13 @@ const loadEnvVariables = (): EnvConfig => {
         "SMTP_USER",
         "SMTP_PORT",
         "SMTP_PASS",
-        "SMTP_FROM",]
+        "SMTP_FROM",
+        "BCRYPT_SALT",
+        "REDIS_USERNAME",
+        "REDIS_PASSWORD",
+        "REDIS_HOST",
+        "REDIS_PORT"
+    ]
 
     requiredEnvVariables.forEach(key => {
         if (!process.env[key]) {
@@ -73,6 +85,8 @@ const loadEnvVariables = (): EnvConfig => {
         CALLBACK_URL: process.env.CALLBACK_URL as string,
         SESSION_SECRET: process.env.SESSION_SECRET as string,
         FRONT_END_URL: process.env.FRONT_END_URL as string,
+        BCRYPT_SALT: process.env.BCRYPT_SALT as string,
+
         SSL: {
 
             SSL_STORE_ID: process.env.SSL_STORE_ID as string,
@@ -98,6 +112,12 @@ const loadEnvVariables = (): EnvConfig => {
             SMTP_PASS: process.env.SMTP_PASS as string,
             SMTP_FROM: process.env.SMTP_FROM as string
         },
+        REDIS: {
+            REDIS_USERNAME: process.env.REDIS_USERNAME as string,
+            REDIS_PASSWORD: process.env.REDIS_PASSWORD as string,
+            REDIS_HOST: process.env.REDIS_HOST as string,
+            REDIS_PORT: process.env.REDIS_PORT as string
+        }
 
     }
 }
