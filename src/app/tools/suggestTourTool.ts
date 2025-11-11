@@ -10,7 +10,7 @@ export const suggestTourTool = new DynamicTool({
     description: "Suggests tours based on the user's request such as location, type,costForm or experience.",
     func: async (input: string) => {
         try {
-            const res = await axios.get("https://health-care-beckend.vercel.app/api/v1/tour");
+            const res = await axios.get("https://beckend-tour-management.vercel.app/api/v1/tour");
             const tours = res?.data?.data || [];
             const matched = tours?.filter((tour: { location: string; title: string; description: string; }) => {
                 const keywords = input.toLowerCase().split(" ");
