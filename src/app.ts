@@ -12,8 +12,11 @@ import './app/config/passport'
 const app = express()
 
 app.use(cors({
-    origin: "https://frontend-tour-management-delta.vercel.app",
-    credentials: true
+    origin: [
+        "https://frontend-tour-management-delta.vercel.app", 
+        "http://localhost:3000",                             
+    ],
+    credentials: true,
 }));
 app.use(express.json())
 app.use(cookieParser())

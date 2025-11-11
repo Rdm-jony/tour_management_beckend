@@ -24,8 +24,11 @@ const express_session_1 = __importDefault(require("express-session"));
 require("./app/config/passport");
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
-    origin: "https://frontend-tour-management-delta.vercel.app",
-    credentials: true
+    origin: [
+        "https://frontend-tour-management-delta.vercel.app",
+        "http://localhost:3000",
+    ],
+    credentials: true,
 }));
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
