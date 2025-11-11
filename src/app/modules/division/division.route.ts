@@ -13,4 +13,4 @@ router.get("/", divisionControllers.getDivision)
 router.patch("/:id",checkAuth(Role.ADMIN, Role.SUPERADMIN),multerUpload.single("file"), validateRequest(updateDivisionZodSchema),  divisionControllers.updateDivision)
 router.delete("/:id", checkAuth(Role.ADMIN, Role.SUPERADMIN), divisionControllers.deleteDivision)
 
-export const divisonRoutes = router
+export const divisonRoutes = router                         

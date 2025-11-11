@@ -17,7 +17,19 @@ const createBooking = catchAsync(async (req: Request, res: Response, next: NextF
         statusCode: httpStatusCode.CREATED
     })
 })
+const getMyBookings = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload
+    const bookings = await bookingServices.getMyBookings(decodedToken.userId)
+
+    sendResponse(res, {
+        data: bookings,
+        message: "Retrived booking successfully",
+        success: true,
+        statusCode: httpStatusCode.OK
+    })
+})
 
 export const bookingController = {
-    createBooking
+    createBooking,
+    getMyBookings
 }

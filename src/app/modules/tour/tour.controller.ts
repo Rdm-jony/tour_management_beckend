@@ -7,7 +7,11 @@ import httpStatusCode from "http-status-codes"
 import { ITour } from "./tour.interface";
 
 const createTourType = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const tourType = await tourServices.createTourType(req.body)
+    const payload = {
+        ...req.body,
+        image: req.file?.path
+    }
+    const tourType = await tourServices.createTourType(payload)
     sendResponse(res, {
         data: tourType.newTourType,
         message: "create tour type successfully",
@@ -18,7 +22,7 @@ const createTourType = catchAsync(async (req: Request, res: Response, next: Next
 const getTourType = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const tourType = await tourServices.getTourTypes()
     sendResponse(res, {
-        data: tourType.getTourTypes,
+        data: tourType,
         message: "tour types retrived successfully",
         statusCode: httpStatusCode.OK,
         success: true
@@ -26,7 +30,11 @@ const getTourType = catchAsync(async (req: Request, res: Response, next: NextFun
 })
 const updateTourType = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const tourTypeId = req.params.id
-    const tourType = await tourServices.updateTourType(tourTypeId, req.body)
+    const payload = {
+        ...req.body,
+        image: req.file?.path
+    }
+    const tourType = await tourServices.updateTourType(tourTypeId, payload)
     sendResponse(res, {
         data: tourType.updatedTourType,
         message: "tour type update successfully",
@@ -70,18 +78,24 @@ const getAllTour = catchAsync(async (req: Request, res: Response, next: NextFunc
 })
 const updateTour = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const tourId = req.params.id
-    const payload: ITour = {
-        ...req.body,
-        images: (req.files as Express.Multer.File[])?.map(file => file.path)
+
+    const payload: Partial<ITour> = { ...req.body }
+
+    const uploadedImages = (req.files as Express.Multer.File[])?.map(file => file.path)
+    if (uploadedImages && uploadedImages.length > 0) {
+        payload.images = uploadedImages
     }
+
     const tour = await tourServices.updateTour(tourId, payload)
+
     sendResponse(res, {
         data: tour.updatedTour,
-        message: "tour updated successfully!",
+        message: "Tour updated successfully!",
         statusCode: httpStatusCode.OK,
         success: true
     })
 })
+
 const deleteTour = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const tourId = req.params.id
     const tour = await tourServices.deleteTour(tourId)
@@ -92,7 +106,17 @@ const deleteTour = catchAsync(async (req: Request, res: Response, next: NextFunc
         success: true
     })
 })
+const getSingleTour = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const tourId = req.params.id
+    const tour = await tourServices.getSingleTour(tourId)
+    sendResponse(res, {
+        data: tour,
+        message: "tour retrived successfully!",
+        statusCode: httpStatusCode.OK,
+        success: true
+    })
+})
 
 
 
-export const tourControllers = { createTourType, getTourType, updateTourType, deleteTourType, createTour, getAllTour, updateTour, deleteTour }
+export const tourControllers = { createTourType, getTourType, updateTourType, deleteTourType, createTour, getAllTour, updateTour, deleteTour, getSingleTour }

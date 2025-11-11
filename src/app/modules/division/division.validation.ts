@@ -8,11 +8,6 @@ export const createDivisionZodSchema = z.object({
     .string({ invalid_type_error: "Description must be a string" })
     .min(10, "Description must be at least 10 characters long")
     .optional(),
-
-  thumbnail: z
-    .string({ invalid_type_error: "Thumbnail must be a string" })
-    .url("Thumbnail must be a valid URL")
-    .optional(),
 });
 export const updateDivisionZodSchema = z.object({
   name: z

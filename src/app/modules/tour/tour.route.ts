@@ -8,13 +8,14 @@ import { multerUpload } from "../../config/multer.config";
 
 const router=Router()
 
-router.post("/create-tour-type",validateRequest(createTourTypeZodSchema),checkAuth(Role.ADMIN,Role.SUPERADMIN),tourControllers.createTourType)
+router.post("/create-tour-type",checkAuth(Role.ADMIN,Role.SUPERADMIN),multerUpload.single("file"), validateRequest(createTourTypeZodSchema),tourControllers.createTourType)
 router.get("/tour-types",tourControllers.getTourType)
-router.patch("/tour-types/:id",validateRequest(updateTourTypeZodSchema),checkAuth(Role.ADMIN,Role.SUPERADMIN),tourControllers.updateTourType)
+router.patch("/tour-types/:id",checkAuth(Role.ADMIN,Role.SUPERADMIN),multerUpload.single("file"),validateRequest(updateTourTypeZodSchema),tourControllers.updateTourType)
 router.delete("/tour-types/:id",checkAuth(Role.ADMIN,Role.SUPERADMIN),tourControllers.deleteTourType)
 
 router.post("/create",checkAuth(Role.ADMIN,Role.SUPERADMIN),multerUpload.array('files'),validateRequest(createTourZodSchema),tourControllers.createTour)
 router.get("/",tourControllers.getAllTour)
+router.get("/:id",tourControllers.getSingleTour)
 router.patch("/:id",checkAuth(Role.ADMIN,Role.SUPERADMIN),multerUpload.array('files'),validateRequest(updateTourZodSchema),tourControllers.updateTour)
 router.delete("/:id",checkAuth(Role.ADMIN,Role.SUPERADMIN),tourControllers.deleteTour)
 

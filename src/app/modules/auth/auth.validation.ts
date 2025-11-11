@@ -32,6 +32,4 @@ export const resetPasswordSchema = z.object({
 
 export const forgetPasswordSchema = z.object({
     email: z.string().email({ message: "Invalid email address format." })
-        .min(5, { message: "Email must be at least 5 characters long." })
-        .max(100, { message: "Email cannot exceed 100 characters." }).nonempty("required")
 })

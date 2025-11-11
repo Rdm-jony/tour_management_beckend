@@ -80,4 +80,15 @@ const createBooking = async (userId: string, payload: Partial<IBooking>) => {
     }
 }
 
-export const bookingServices = { createBooking }
+const getMyBookings = async (userId: string) => {
+    const findUser = await User.findById(userId)
+    if (!findUser) {
+        throw new AppError(httpStatusCode.NOT_FOUND, "user not found")
+    }
+
+    const bookings = await Booking.find({ user: userId }).populate("user").populate("payment").populate("tour")
+    return bookings;
+
+}
+
+export const bookingServices = { createBooking, getMyBookings }

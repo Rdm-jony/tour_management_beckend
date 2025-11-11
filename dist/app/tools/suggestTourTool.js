@@ -25,7 +25,7 @@ exports.suggestTourTool = new tools_1.DynamicTool({
     func: (input) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
         try {
-            const res = yield axios_1.default.get("http://localhost:5000/api/v1/tour");
+            const res = yield axios_1.default.get("https://health-care-beckend.vercel.app/api/v1/tour");
             const tours = ((_a = res === null || res === void 0 ? void 0 : res.data) === null || _a === void 0 ? void 0 : _a.data) || [];
             const matched = tours === null || tours === void 0 ? void 0 : tours.filter((tour) => {
                 const keywords = input.toLowerCase().split(" ");

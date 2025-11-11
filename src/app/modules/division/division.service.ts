@@ -13,10 +13,28 @@ const createDivision = async (payload: Partial<IDivision>) => {
 }
 
 const getDivision = async () => {
-    const getDivisions = await Division.find({})
-    return {
-        getDivisions
+   const divisions = await Division.aggregate([
+    {
+      $lookup: {
+        from: "tours", // collection name (must match the actual collection)
+        localField: "_id",
+        foreignField: "division",
+        as: "tours"
+      }
+    },
+    {
+      $addFields: {
+        totalTours: { $size: "$tours" } // count how many tours in that division
+      }
+    },
+    {
+      $project: {
+        tours: 0 // hide the tours array if you only want the count
+      }
     }
+  ]);
+
+  return divisions;
 }
 
 const updateDivision = async (divisionId: string, payload: Partial<IDivision>) => {
@@ -35,7 +53,7 @@ const updateDivision = async (divisionId: string, payload: Partial<IDivision>) =
     }
 
     const updatedDivision = await Division.findByIdAndUpdate(divisionId, payload, { new: true, runValidators: true })
-    if(findDivision.thumbnail){
+    if (findDivision.thumbnail) {
         await deleteImageFromCLoudinary(findDivision.thumbnail)
     }
 
@@ -55,6 +73,9 @@ const deleteDivision = async (divisionId: string) => {
         throw new AppError(httpStatusCode.BAD_REQUEST, "This division exists in tours. Cannot delete.");
     }
     await Division.findByIdAndDelete(divisionId)
+    if (findDivision.thumbnail) {
+        await deleteImageFromCLoudinary(findDivision.thumbnail)
+    }
 
 }
 

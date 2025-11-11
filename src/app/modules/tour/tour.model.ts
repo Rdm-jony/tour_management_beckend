@@ -3,7 +3,8 @@ import { ITour, ITourType } from "./tour.interface";
 
 const tourTypeSchema = new Schema<ITourType>({
     name: { type: String, required: true, unique: true },
-    slug: { type: String, unique: true }
+    slug: { type: String, unique: true },
+    image: { type: String }
 }, {
     timestamps: true
 })
@@ -17,7 +18,6 @@ tourTypeSchema.pre("save", async function (next) {
         }
 
         this.slug = baseSlug;
-        console.log(this.slug)
     }
     next()
 })
@@ -41,19 +41,21 @@ export const TourType = model("TourType", tourTypeSchema)
 
 const tourSchema = new Schema<ITour>({
     title: { type: String, required: true },
-    slug: { type: String,  unique: true },
+    slug: { type: String, unique: true },
     description: { type: String },
     images: { type: [String], default: [] },
     amenities: { type: [String], default: [] },
     included: { type: [String], default: [] },
     excluded: { type: [String], default: [] },
-    tourPlan: { type: [String], default: [] },
+    videoUrl: { type: String },
     costForm: { type: Number },
-    startDate: { type: Date },
-    endDate: { type: Date },
     location: { type: String },
     maxGuest: { type: Number },
     minAge: { type: Number },
+    lat: { type: String },
+    lng: { type: String },
+    averageRating: { type: Number, default: 0 },
+    totalReviews: { type: Number, default: 0 },
     division: { type: Schema.Types.ObjectId, ref: "Division", required: true },
     tourType: { type: Schema.Types.ObjectId, ref: "TourType", required: true }
 }, {

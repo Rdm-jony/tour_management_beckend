@@ -23,7 +23,7 @@ const createDivision = catchAsync(async (req: Request, res: Response, next: Next
 const getDivision = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const division = await divisionServices.getDivision()
     sendResponse(res, {
-        data: division.getDivisions,
+        data: division,
         message: "division retrived successFully",
         statusCode: httpStatusCode.OK,
         success: true

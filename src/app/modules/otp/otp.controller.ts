@@ -16,7 +16,6 @@ const sendOtp = catchAsync(async (req: Request, res: Response) => {
 })
 const verifyOtp = catchAsync(async (req: Request, res: Response) => {
     await otpSrvice.verifyOtp(req.body)
-
     sendResponse(res, {
         data: null,
         message: "verify email successfully",
