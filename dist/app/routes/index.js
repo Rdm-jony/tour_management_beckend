@@ -8,6 +8,8 @@ const division_route_1 = require("../modules/division/division.route");
 const tour_route_1 = require("../modules/tour/tour.route");
 const booking_route_1 = require("../modules/booking/booking.route");
 const payment_route_1 = require("../modules/payment/payment.route");
+const otp_route_1 = require("../modules/otp/otp.route");
+const review_route_1 = require("../modules/reviews/review.route");
 exports.router = (0, express_1.Router)();
 const moduleRputes = [
     {
@@ -17,6 +19,10 @@ const moduleRputes = [
     {
         route: "/auth",
         path: auth_route_1.authRoutes
+    },
+    {
+        route: "/otp",
+        path: otp_route_1.otpRoutes
     },
     {
         route: "/division",
@@ -33,6 +39,10 @@ const moduleRputes = [
     {
         route: "/payment",
         path: payment_route_1.paymentRoutes
+    },
+    {
+        route: "/review",
+        path: review_route_1.reviewRoutes
     }
 ];
 moduleRputes.forEach(route => exports.router.use(route.route, route.path));

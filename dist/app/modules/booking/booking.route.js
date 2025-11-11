@@ -8,5 +8,6 @@ const validateRequest_1 = require("../../middlewares/validateRequest");
 const booking_validation_1 = require("./booking.validation");
 const booking_controller_1 = require("./booking.controller");
 const router = (0, express_1.Router)();
+router.get("/myBooking", (0, checkAuth_1.checkAuth)(user_interface_1.Role.USER, user_interface_1.Role.SUPERADMIN), booking_controller_1.bookingController.getMyBookings);
 router.post("/create", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.Role)), (0, validateRequest_1.validateRequest)(booking_validation_1.createBookingZodSchema), booking_controller_1.bookingController.createBooking);
 exports.bookingRoutes = router;

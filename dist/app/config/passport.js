@@ -25,19 +25,31 @@ passport_1.default.use(new passport_local_1.Strategy({
     passwordField: "password"
 }, (email, password, done) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield user_model_1.User.findOne({ email });
-        if (!user) {
-            return done("User not found. Please register.");
+        const isUserExist = yield user_model_1.User.findOne({ email });
+        if (!isUserExist) {
+            return done("User does not exist");
         }
-        const isGoogleAuthenticated = user.auths.some(providerObjects => providerObjects.provider == "Google");
-        if (isGoogleAuthenticated && !user.password) {
-            return done("You have authenticated through Google. So if you want to login with credentials, then at first login with google and set a password for your Gmail and then you can login with email and password.");
-        }
-        const isPasswordMatched = yield bcryptjs_1.default.compare(password, user.password);
+        const isPasswordMatched = yield bcryptjs_1.default.compare(password, isUserExist.password);
         if (!isPasswordMatched) {
             return done("Password does not match");
         }
-        return done(null, user);
+        if (!isUserExist.isVerified) {
+            // throw new AppError(httpStatus.BAD_REQUEST, "User is not verified")
+            return done("User is not verified");
+        }
+        if (isUserExist.isActive === user_interface_1.IsActive.BLOCKED || isUserExist.isActive === user_interface_1.IsActive.INACTIVE) {
+            // throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExist.isActive}`)
+            return done(`User is ${isUserExist.isActive}`);
+        }
+        if (isUserExist.isDeleted) {
+            // throw new AppError(httpStatus.BAD_REQUEST, "User is deleted")
+            return done("User is deleted");
+        }
+        const isGoogleAuthenticated = isUserExist.auths.some(providerObjects => providerObjects.provider == "Google");
+        if (isGoogleAuthenticated && !isUserExist.password) {
+            return done("You have authenticated through Google. So if you want to login with credentials, then at first login with google and set a password for your Gmail and then you can login with email and password.");
+        }
+        return done(null, isUserExist);
     }
     catch (error) {
         console.log(error);
@@ -56,9 +68,9 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
         if (!email) {
             return done(null, false, { message: "email not found" });
         }
-        let user = yield user_model_1.User.findOne({ email });
-        if (!user) {
-            user = yield user_model_1.User.create({
+        let isUserExist = yield user_model_1.User.findOne({ email });
+        if (!isUserExist) {
+            isUserExist = yield user_model_1.User.create({
                 name: profile === null || profile === void 0 ? void 0 : profile.displayName,
                 email: (_b = profile === null || profile === void 0 ? void 0 : profile.emails) === null || _b === void 0 ? void 0 : _b[0].value,
                 picture: (_c = profile === null || profile === void 0 ? void 0 : profile.photos) === null || _c === void 0 ? void 0 : _c[0].value,
@@ -72,7 +84,19 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
                 ]
             });
         }
-        return done(null, user);
+        if (!isUserExist.isVerified) {
+            // throw new AppError(httpStatus.BAD_REQUEST, "User is not verified")
+            return done("User is not verified");
+        }
+        if (isUserExist.isActive === user_interface_1.IsActive.BLOCKED || isUserExist.isActive === user_interface_1.IsActive.INACTIVE) {
+            // throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExist.isActive}`)
+            return done(`User is ${isUserExist.isActive}`);
+        }
+        if (isUserExist.isDeleted) {
+            // throw new AppError(httpStatus.BAD_REQUEST, "User is deleted")
+            return done("User is deleted");
+        }
+        return done(null, isUserExist);
     }
     catch (error) {
         console.log(error);

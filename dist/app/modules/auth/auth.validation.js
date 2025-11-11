@@ -34,6 +34,4 @@ exports.resetPasswordSchema = zod_1.default.object({
 });
 exports.forgetPasswordSchema = zod_1.default.object({
     email: zod_1.default.string().email({ message: "Invalid email address format." })
-        .min(5, { message: "Email must be at least 5 characters long." })
-        .max(100, { message: "Email cannot exceed 100 characters." }).nonempty("required")
 });

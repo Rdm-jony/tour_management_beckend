@@ -25,10 +25,27 @@ const createDivision = (payload) => __awaiter(void 0, void 0, void 0, function* 
     };
 });
 const getDivision = () => __awaiter(void 0, void 0, void 0, function* () {
-    const getDivisions = yield division_model_1.Division.find({});
-    return {
-        getDivisions
-    };
+    const divisions = yield division_model_1.Division.aggregate([
+        {
+            $lookup: {
+                from: "tours", // collection name (must match the actual collection)
+                localField: "_id",
+                foreignField: "division",
+                as: "tours"
+            }
+        },
+        {
+            $addFields: {
+                totalTours: { $size: "$tours" } // count how many tours in that division
+            }
+        },
+        {
+            $project: {
+                tours: 0 // hide the tours array if you only want the count
+            }
+        }
+    ]);
+    return divisions;
 });
 const updateDivision = (divisionId, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const findDivision = yield division_model_1.Division.findById(divisionId);
@@ -60,5 +77,8 @@ const deleteDivision = (divisionId) => __awaiter(void 0, void 0, void 0, functio
         throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "This division exists in tours. Cannot delete.");
     }
     yield division_model_1.Division.findByIdAndDelete(divisionId);
+    if (findDivision.thumbnail) {
+        yield (0, cloudinary_confilg_1.deleteImageFromCLoudinary)(findDivision.thumbnail);
+    }
 });
 exports.divisionServices = { createDivision, getDivision, updateDivision, deleteDivision };

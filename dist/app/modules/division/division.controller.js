@@ -31,7 +31,7 @@ const createDivision = (0, catchAsync_1.catchAsync)((req, res, next) => __awaite
 const getDivision = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const division = yield division_service_1.divisionServices.getDivision();
     (0, sendResponse_1.sendResponse)(res, {
-        data: division.getDivisions,
+        data: division,
         message: "division retrived successFully",
         statusCode: http_status_codes_1.default.OK,
         success: true

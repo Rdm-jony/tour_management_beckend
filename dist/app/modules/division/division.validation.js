@@ -13,10 +13,6 @@ exports.createDivisionZodSchema = zod_1.default.object({
         .string({ invalid_type_error: "Description must be a string" })
         .min(10, "Description must be at least 10 characters long")
         .optional(),
-    thumbnail: zod_1.default
-        .string({ invalid_type_error: "Thumbnail must be a string" })
-        .url("Thumbnail must be a valid URL")
-        .optional(),
 });
 exports.updateDivisionZodSchema = zod_1.default.object({
     name: zod_1.default

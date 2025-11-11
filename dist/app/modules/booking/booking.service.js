@@ -80,4 +80,12 @@ const createBooking = (userId, payload) => __awaiter(void 0, void 0, void 0, fun
         throw error;
     }
 });
-exports.bookingServices = { createBooking };
+const getMyBookings = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const findUser = yield user_model_1.User.findById(userId);
+    if (!findUser) {
+        throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "user not found");
+    }
+    const bookings = yield booking_model_1.Booking.find({ user: userId }).populate("user").populate("payment").populate("tour");
+    return bookings;
+});
+exports.bookingServices = { createBooking, getMyBookings };

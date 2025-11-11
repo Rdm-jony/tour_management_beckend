@@ -27,6 +27,17 @@ const createBooking = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter
         statusCode: http_status_codes_1.default.CREATED
     });
 }));
+const getMyBookings = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const decodedToken = req.user;
+    const bookings = yield booking_service_1.bookingServices.getMyBookings(decodedToken.userId);
+    (0, sendResponse_1.sendResponse)(res, {
+        data: bookings,
+        message: "Retrived booking successfully",
+        success: true,
+        statusCode: http_status_codes_1.default.OK
+    });
+}));
 exports.bookingController = {
-    createBooking
+    createBooking,
+    getMyBookings
 };

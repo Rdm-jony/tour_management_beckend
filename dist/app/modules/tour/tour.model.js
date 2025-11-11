@@ -13,7 +13,8 @@ exports.Tour = exports.TourType = void 0;
 const mongoose_1 = require("mongoose");
 const tourTypeSchema = new mongoose_1.Schema({
     name: { type: String, required: true, unique: true },
-    slug: { type: String, unique: true }
+    slug: { type: String, unique: true },
+    image: { type: String }
 }, {
     timestamps: true
 });
@@ -26,7 +27,6 @@ tourTypeSchema.pre("save", function (next) {
                 baseSlug = `${baseSlug}-${counter++}`;
             }
             this.slug = baseSlug;
-            console.log(this.slug);
         }
         next();
     });
@@ -55,13 +55,15 @@ const tourSchema = new mongoose_1.Schema({
     amenities: { type: [String], default: [] },
     included: { type: [String], default: [] },
     excluded: { type: [String], default: [] },
-    tourPlan: { type: [String], default: [] },
+    videoUrl: { type: String },
     costForm: { type: Number },
-    startDate: { type: Date },
-    endDate: { type: Date },
     location: { type: String },
     maxGuest: { type: Number },
     minAge: { type: Number },
+    lat: { type: String },
+    lng: { type: String },
+    averageRating: { type: Number, default: 0 },
+    totalReviews: { type: Number, default: 0 },
     division: { type: mongoose_1.Schema.Types.ObjectId, ref: "Division", required: true },
     tourType: { type: mongoose_1.Schema.Types.ObjectId, ref: "TourType", required: true }
 }, {

@@ -27,7 +27,7 @@ const credentialsLogin = (0, catchAsync_1.catchAsync)((req, res, next) => __awai
         if (err) {
             return next(new AppError_1.default(401, err));
         }
-        delete user.toObject().password;
+        user === null || user === void 0 ? true : delete user.toObject().password;
         const userTokens = (0, userTokens_1.createUserTokens)(user);
         (0, setCookies_1.setAuthCookie)(res, userTokens);
         (0, sendResponse_1.sendResponse)(res, {

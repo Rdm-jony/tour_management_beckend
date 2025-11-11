@@ -18,7 +18,9 @@ const tour_service_1 = require("./tour.service");
 const sendResponse_1 = require("../../utils/sendResponse");
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const createTourType = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const tourType = yield tour_service_1.tourServices.createTourType(req.body);
+    var _a;
+    const payload = Object.assign(Object.assign({}, req.body), { image: (_a = req.file) === null || _a === void 0 ? void 0 : _a.path });
+    const tourType = yield tour_service_1.tourServices.createTourType(payload);
     (0, sendResponse_1.sendResponse)(res, {
         data: tourType.newTourType,
         message: "create tour type successfully",
@@ -29,15 +31,17 @@ const createTourType = (0, catchAsync_1.catchAsync)((req, res, next) => __awaite
 const getTourType = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const tourType = yield tour_service_1.tourServices.getTourTypes();
     (0, sendResponse_1.sendResponse)(res, {
-        data: tourType.getTourTypes,
+        data: tourType,
         message: "tour types retrived successfully",
         statusCode: http_status_codes_1.default.OK,
         success: true
     });
 }));
 const updateTourType = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const tourTypeId = req.params.id;
-    const tourType = yield tour_service_1.tourServices.updateTourType(tourTypeId, req.body);
+    const payload = Object.assign(Object.assign({}, req.body), { image: (_a = req.file) === null || _a === void 0 ? void 0 : _a.path });
+    const tourType = yield tour_service_1.tourServices.updateTourType(tourTypeId, payload);
     (0, sendResponse_1.sendResponse)(res, {
         data: tourType.updatedTourType,
         message: "tour type update successfully",
@@ -80,11 +84,15 @@ const getAllTour = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(vo
 const updateTour = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const tourId = req.params.id;
-    const payload = Object.assign(Object.assign({}, req.body), { images: (_a = req.files) === null || _a === void 0 ? void 0 : _a.map(file => file.path) });
+    const payload = Object.assign({}, req.body);
+    const uploadedImages = (_a = req.files) === null || _a === void 0 ? void 0 : _a.map(file => file.path);
+    if (uploadedImages && uploadedImages.length > 0) {
+        payload.images = uploadedImages;
+    }
     const tour = yield tour_service_1.tourServices.updateTour(tourId, payload);
     (0, sendResponse_1.sendResponse)(res, {
         data: tour.updatedTour,
-        message: "tour updated successfully!",
+        message: "Tour updated successfully!",
         statusCode: http_status_codes_1.default.OK,
         success: true
     });
@@ -99,4 +107,14 @@ const deleteTour = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(vo
         success: true
     });
 }));
-exports.tourControllers = { createTourType, getTourType, updateTourType, deleteTourType, createTour, getAllTour, updateTour, deleteTour };
+const getSingleTour = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const tourId = req.params.id;
+    const tour = yield tour_service_1.tourServices.getSingleTour(tourId);
+    (0, sendResponse_1.sendResponse)(res, {
+        data: tour,
+        message: "tour retrived successfully!",
+        statusCode: http_status_codes_1.default.OK,
+        success: true
+    });
+}));
+exports.tourControllers = { createTourType, getTourType, updateTourType, deleteTourType, createTour, getAllTour, updateTour, deleteTour, getSingleTour };

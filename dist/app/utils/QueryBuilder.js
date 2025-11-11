@@ -18,11 +18,31 @@ class QueryBuilder {
     }
     filter() {
         const filter = Object.assign({}, this.query);
+        // remove excluded fields
         for (const field of constant_1.excludeField) {
             // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
             delete filter[field];
         }
-        this.modelQuery = this.modelQuery.find(filter);
+        // Build dynamic filter
+        const andConditions = [];
+        // Handle price range filtering
+        if (filter.minPrice || filter.maxPrice) {
+            const priceRange = {};
+            if (filter.minPrice)
+                priceRange.$gte = Number(filter.minPrice);
+            if (filter.maxPrice)
+                priceRange.$lte = Number(filter.maxPrice);
+            andConditions.push({ costForm: priceRange });
+            delete filter.minPrice;
+            delete filter.maxPrice;
+        }
+        // Add remaining filters (like category, division, etc.)
+        if (Object.keys(filter).length > 0) {
+            andConditions.push(filter);
+        }
+        if (andConditions.length > 0) {
+            this.modelQuery = this.modelQuery.find({ $and: andConditions });
+        }
         return this;
     }
     search(searChQueryFields) {
@@ -52,6 +72,9 @@ class QueryBuilder {
         this.modelQuery = this.modelQuery.skip(skip).limit(limit);
         return this;
     }
+    build() {
+        return this.modelQuery;
+    }
     getMeta() {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
@@ -61,9 +84,6 @@ class QueryBuilder {
             const totalPage = Math.ceil(totalDocumnet / limit);
             return { total: totalDocumnet, totalPage, limit, page };
         });
-    }
-    build() {
-        return this.modelQuery;
     }
 }
 exports.QueryBuilder = QueryBuilder;

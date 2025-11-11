@@ -23,38 +23,25 @@ exports.createTourZodSchema = zod_1.default.object({
     images: zod_1.default
         .array(zod_1.default.string().url("Each image must be a valid URL"))
         .optional(),
-    amenities: zod_1.default
-        .array(zod_1.default.string())
-        .optional(),
     included: zod_1.default
         .array(zod_1.default.string())
         .optional(),
     excluded: zod_1.default
         .array(zod_1.default.string())
         .optional(),
-    tourPlan: zod_1.default
-        .array(zod_1.default.string())
-        .optional(),
     costForm: zod_1.default
         .number({ invalid_type_error: "Cost must be a number" })
         .positive("Cost must be greater than 0").optional(),
-    startDate: zod_1.default
-        .string({ invalid_type_error: "Start date must be a string" })
-        .refine(val => !isNaN(Date.parse(val)), {
-        message: "Start date must be a valid ISO date string",
-    }).optional(),
-    endDate: zod_1.default
-        .string({ invalid_type_error: "End date must be a string" })
-        .refine(val => !isNaN(Date.parse(val)), {
-        message: "End date must be a valid ISO date string",
-    }).optional(),
     location: zod_1.default
         .string({ invalid_type_error: "Location must be a string" })
         .min(3, "Location must be at least 3 characters").optional(),
+    lat: zod_1.default.string().optional(),
+    lng: zod_1.default.string().optional(),
     maxGuest: zod_1.default
         .number({ invalid_type_error: "Max guest must be a number" })
         .int()
         .positive().optional(),
+    videoUrl: zod_1.default.string().optional(),
     minAge: zod_1.default
         .number({ invalid_type_error: "Min age must be a number" })
         .int()
@@ -81,11 +68,9 @@ exports.updateTourZodSchema = zod_1.default.object({
     images: zod_1.default
         .array(zod_1.default.string().url("Each image must be a valid URL"))
         .optional(),
+    videoUrl: zod_1.default.string().optional(),
     deletedImages: zod_1.default
         .array(zod_1.default.string().url("Each image must be a valid URL"))
-        .optional(),
-    amenities: zod_1.default
-        .array(zod_1.default.string())
         .optional(),
     included: zod_1.default
         .array(zod_1.default.string())
@@ -93,25 +78,13 @@ exports.updateTourZodSchema = zod_1.default.object({
     excluded: zod_1.default
         .array(zod_1.default.string())
         .optional(),
-    tourPlan: zod_1.default
-        .array(zod_1.default.string())
-        .optional(),
     costForm: zod_1.default
-        .number({ invalid_type_error: "Cost must be a number" })
-        .positive("Cost must be greater than 0").optional(),
-    startDate: zod_1.default
-        .string({ invalid_type_error: "Start date must be a string" })
-        .refine(val => !isNaN(Date.parse(val)), {
-        message: "Start date must be a valid ISO date string",
-    }).optional(),
-    endDate: zod_1.default
-        .string({ invalid_type_error: "End date must be a string" })
-        .refine(val => !isNaN(Date.parse(val)), {
-        message: "End date must be a valid ISO date string",
-    }).optional(),
+        .number({ invalid_type_error: "Cost must be a number" }).optional(),
     location: zod_1.default
         .string({ invalid_type_error: "Location must be a string" })
         .min(3, "Location must be at least 3 characters").optional(),
+    lat: zod_1.default.string().optional(),
+    lng: zod_1.default.string().optional(),
     maxGuest: zod_1.default
         .number({ invalid_type_error: "Max guest must be a number" })
         .int()

@@ -26,10 +26,27 @@ const createTourType = (payload) => __awaiter(void 0, void 0, void 0, function* 
     };
 });
 const getTourTypes = () => __awaiter(void 0, void 0, void 0, function* () {
-    const getTourTypes = yield tour_model_1.TourType.find({});
-    return {
-        getTourTypes
-    };
+    const tourTypesWithCount = yield tour_model_1.TourType.aggregate([
+        {
+            $lookup: {
+                from: "tours", // ✅ collection name (check your model name carefully)
+                localField: "_id",
+                foreignField: "tourType",
+                as: "tours"
+            }
+        },
+        {
+            $addFields: {
+                totalTours: { $size: "$tours" }
+            }
+        },
+        {
+            $project: {
+                tours: 0 // tours array hide করে শুধুমাত্র count return করা
+            }
+        }
+    ]);
+    return tourTypesWithCount;
 });
 const updateTourType = (tourTypeId, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const findTourType = yield tour_model_1.TourType.findById(tourTypeId);
@@ -37,6 +54,9 @@ const updateTourType = (tourTypeId, payload) => __awaiter(void 0, void 0, void 0
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Tour type not found");
     }
     const updatedTourType = yield tour_model_1.TourType.findByIdAndUpdate(tourTypeId, payload, { new: true, runValidators: true });
+    if (findTourType.image && payload.image) {
+        yield (0, cloudinary_confilg_1.deleteImageFromCLoudinary)(findTourType.image);
+    }
     return {
         updatedTourType
     };
@@ -51,6 +71,9 @@ const deleteTourType = (tourTypeId) => __awaiter(void 0, void 0, void 0, functio
         throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Tour type exists in tours. Cannot delete.");
     }
     yield tour_model_1.TourType.findByIdAndDelete(tourTypeId);
+    if (findTourType.image) {
+        yield (0, cloudinary_confilg_1.deleteImageFromCLoudinary)(findTourType.image);
+    }
 });
 const createTour = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const newTour = yield tour_model_1.Tour.create(payload);
@@ -64,35 +87,44 @@ const getAllTour = (query) => __awaiter(void 0, void 0, void 0, function* () {
         .sort()
         .fields()
         .paginate()
-        .build();
+        .build().populate("division").populate("tourType");
     const meta = yield queryBuilder.getMeta();
     return {
         getTours,
         meta
     };
 });
+const getSingleTour = (tourId) => __awaiter(void 0, void 0, void 0, function* () {
+    const findTour = yield tour_model_1.Tour.findById(tourId).populate("tourType").populate("division");
+    if (!findTour) {
+        throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Tour not found");
+    }
+    return findTour;
+});
 const updateTour = (tourId, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const findTour = yield tour_model_1.Tour.findById(tourId);
-    if ((findTour === null || findTour === void 0 ? void 0 : findTour.images) && (findTour === null || findTour === void 0 ? void 0 : findTour.images.length) > 0 && payload.images && payload.images.length > 0) {
-        payload.images = [...findTour.images, ...payload.images];
-    }
-    if ((findTour === null || findTour === void 0 ? void 0 : findTour.images) && (findTour === null || findTour === void 0 ? void 0 : findTour.images.length) > 0 && payload.deletedImages && payload.deletedImages.length > 0) {
-        const restImages = findTour.images.filter(image => { var _a; return !((_a = payload.deletedImages) === null || _a === void 0 ? void 0 : _a.includes(image)); });
-        const updatedPayloadImages = (payload.images || [])
-            .filter(imageUrl => { var _a; return !((_a = payload.deletedImages) === null || _a === void 0 ? void 0 : _a.includes(imageUrl)); })
-            .filter(imageUrl => !restImages.includes(imageUrl));
-        payload.images = [...restImages, ...updatedPayloadImages];
-    }
     if (!findTour) {
-        throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Tour is not found");
+        throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Tour not found");
     }
-    const updatedTour = yield tour_model_1.Tour.findByIdAndUpdate(tourId, payload, { new: true, runValidators: true });
-    if ((findTour === null || findTour === void 0 ? void 0 : findTour.images) && (findTour === null || findTour === void 0 ? void 0 : findTour.images.length) > 0 && payload.deletedImages && payload.deletedImages.length > 0) {
-        yield Promise.all(payload.deletedImages.map(image => (0, cloudinary_confilg_1.deleteImageFromCLoudinary)(image)));
+    if (payload.images && payload.images.length > 0) {
+        payload.images = [...(findTour.images || []), ...payload.images];
     }
-    return {
-        updatedTour
-    };
+    else if (!payload.images) {
+        payload.images = findTour.images;
+    }
+    if (payload.deletedImages && payload.deletedImages.length > 0) {
+        const remainingImages = (payload.images || []).filter(img => { var _a; return !((_a = payload.deletedImages) === null || _a === void 0 ? void 0 : _a.includes(img)); });
+        payload.images = remainingImages;
+        yield Promise.all(payload.deletedImages.map(cloudinary_confilg_1.deleteImageFromCLoudinary));
+    }
+    if (payload.videoUrl === "") {
+        delete payload.videoUrl;
+    }
+    const updatedTour = yield tour_model_1.Tour.findByIdAndUpdate(tourId, payload, {
+        new: true,
+        runValidators: true,
+    });
+    return { updatedTour };
 });
 const deleteTour = (tourId) => __awaiter(void 0, void 0, void 0, function* () {
     const findTour = yield tour_model_1.Tour.findById(tourId);
@@ -100,5 +132,8 @@ const deleteTour = (tourId) => __awaiter(void 0, void 0, void 0, function* () {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Tour is not found");
     }
     yield tour_model_1.Tour.findByIdAndDelete(tourId);
+    if ((findTour === null || findTour === void 0 ? void 0 : findTour.images) && (findTour === null || findTour === void 0 ? void 0 : findTour.images.length) > 0) {
+        yield Promise.all(findTour.images.map(image => (0, cloudinary_confilg_1.deleteImageFromCLoudinary)(image)));
+    }
 });
-exports.tourServices = { createTourType, getTourTypes, updateTourType, deleteTourType, createTour, getAllTour, updateTour, deleteTour };
+exports.tourServices = { createTourType, getTourTypes, updateTourType, deleteTourType, createTour, getAllTour, updateTour, deleteTour, getSingleTour };
