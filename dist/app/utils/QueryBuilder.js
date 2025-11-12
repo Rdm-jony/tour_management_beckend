@@ -66,7 +66,7 @@ class QueryBuilder {
     }
     paginate() {
         var _a, _b;
-        const limit = parseInt((_a = this.query) === null || _a === void 0 ? void 0 : _a.limit) || 5;
+        const limit = parseInt((_a = this.query) === null || _a === void 0 ? void 0 : _a.limit) || 100;
         const page = parseInt((_b = this.query) === null || _b === void 0 ? void 0 : _b.page) || 1;
         const skip = (page - 1) * limit;
         this.modelQuery = this.modelQuery.skip(skip).limit(limit);
